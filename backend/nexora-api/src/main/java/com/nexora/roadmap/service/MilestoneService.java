@@ -2,6 +2,7 @@ package com.nexora.roadmap.service;
 
 import com.nexora.roadmap.dto.request.CreateMilestoneRequest;
 import com.nexora.roadmap.dto.request.UpdateMilestoneRequest;
+import com.nexora.roadmap.dto.response.MilestoneProgressResponse;
 import com.nexora.roadmap.dto.response.MilestoneResponse;
 
 import java.util.List;
@@ -60,4 +61,12 @@ public interface MilestoneService {
      * @param id The Milestone UUID to delete.
      */
     void deleteMilestone(UUID id);
+
+    /**
+     * Calculate and fetch progress tracking information for a specific Milestone.
+     *
+     * @param milestoneId The Milestone UUID.
+     * @return The milestone progress response.
+     */
+    MilestoneProgressResponse getMilestoneProgress(UUID milestoneId);
 }

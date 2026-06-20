@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * <h3>Purpose</h3>
@@ -43,6 +46,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@Tag(name = "Milestones", description = "Operations related to milestones within roadmaps")
 public class MilestoneController {
 
     private final MilestoneService milestoneService;
@@ -55,6 +59,12 @@ public class MilestoneController {
      * @return Standard ApiResponse wrapper containing the created Milestone.
      */
     @PostMapping("/roadmaps/{roadmapId}/milestones")
+    @Operation(summary = "Create a new Milestone under a Roadmap", description = "Creates a new milestone associated with a parent roadmap UUID.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Milestone created successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid request body or validation constraints failed"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Parent roadmap not found")
+    })
     public ResponseEntity<ApiResponse<MilestoneResponse>> createMilestone(
             @PathVariable UUID roadmapId,
             @Valid @RequestBody CreateMilestoneRequest request) {
@@ -71,6 +81,11 @@ public class MilestoneController {
      * @return Standard ApiResponse wrapper containing a list of Milestones.
      */
     @GetMapping("/roadmaps/{roadmapId}/milestones")
+    @Operation(summary = "Get milestones by Roadmap ID", description = "Retrieves a list of milestones for a given roadmap UUID, sorted by sequence order.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "List of milestones retrieved successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Parent roadmap not found")
+    })
     public ResponseEntity<ApiResponse<List<MilestoneResponse>>> getMilestonesByRoadmapId(
             @PathVariable UUID roadmapId) {
         log.info("REST request to fetch all Milestones for Roadmap ID: {}", roadmapId);
@@ -86,6 +101,11 @@ public class MilestoneController {
      * @return Standard ApiResponse wrapper containing the Milestone.
      */
     @GetMapping("/milestones/{id}")
+    @Operation(summary = "Get milestone by ID", description = "Retrieves a specific milestone using its UUID.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Milestone retrieved successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Milestone not found with the given ID")
+    })
     public ResponseEntity<ApiResponse<MilestoneResponse>> getMilestoneById(
             @PathVariable UUID id) {
         log.info("REST request to fetch Milestone with ID: {}", id);
@@ -102,6 +122,12 @@ public class MilestoneController {
      * @return Standard ApiResponse wrapper containing the updated Milestone.
      */
     @PutMapping("/milestones/{id}")
+    @Operation(summary = "Update milestone", description = "Updates the details of an existing milestone using its UUID.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Milestone updated successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid request body or validation constraints failed"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Milestone not found with the given ID")
+    })
     public ResponseEntity<ApiResponse<MilestoneResponse>> updateMilestone(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateMilestoneRequest request) {
@@ -118,6 +144,11 @@ public class MilestoneController {
      * @return Standard ApiResponse wrapper indicating success (empty data field).
      */
     @DeleteMapping("/milestones/{id}")
+    @Operation(summary = "Delete milestone", description = "Deletes a specific milestone and its tasks by its UUID.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Milestone deleted successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Milestone not found with the given ID")
+    })
     public ResponseEntity<ApiResponse<Void>> deleteMilestone(
             @PathVariable UUID id) {
         log.info("REST request to delete Milestone with ID: {}", id);
@@ -133,6 +164,11 @@ public class MilestoneController {
      * @return Standard ApiResponse wrapper containing the MilestoneProgressResponse.
      */
     @GetMapping("/milestones/{id}/progress")
+    @Operation(summary = "Get milestone progress", description = "Calculates and retrieves progress metrics (total tasks, completed tasks, and progress percentage) for a specific milestone.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Milestone progress retrieved successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Milestone not found with the given ID")
+    })
     public ResponseEntity<ApiResponse<MilestoneProgressResponse>> getMilestoneProgress(
             @PathVariable UUID id) {
         log.info("REST request to fetch progress for Milestone with ID: {}", id);

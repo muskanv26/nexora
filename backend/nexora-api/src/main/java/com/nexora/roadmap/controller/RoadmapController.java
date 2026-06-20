@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * <h3>Purpose</h3>
@@ -42,6 +45,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/roadmaps")
 @RequiredArgsConstructor
+@Tag(name = "Roadmaps", description = "Operations related to learning roadmaps")
 public class RoadmapController {
 
     private final RoadmapService roadmapService;
@@ -53,6 +57,11 @@ public class RoadmapController {
      * @return Standard ApiResponse wrapper containing the created Roadmap.
      */
     @PostMapping
+    @Operation(summary = "Create a new Roadmap", description = "Creates a new roadmap with a title, description, and estimated duration in weeks.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Roadmap created successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid request body or validation constraints failed")
+    })
     public ResponseEntity<ApiResponse<RoadmapResponse>> createRoadmap(
             @Valid @RequestBody CreateRoadmapRequest request) {
         log.info("REST request to create a new Roadmap: {}", request.getTitle());
@@ -67,6 +76,10 @@ public class RoadmapController {
      * @return Standard ApiResponse wrapper containing a list of all Roadmaps.
      */
     @GetMapping
+    @Operation(summary = "Get all roadmaps", description = "Retrieves a list of all learning roadmaps.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "List of roadmaps retrieved successfully")
+    })
     public ResponseEntity<ApiResponse<List<RoadmapResponse>>> getAllRoadmaps() {
         log.info("REST request to fetch all Roadmaps");
         
@@ -81,6 +94,11 @@ public class RoadmapController {
      * @return Standard ApiResponse wrapper containing the Roadmap matching the given ID.
      */
     @GetMapping("/{id}")
+    @Operation(summary = "Get roadmap by ID", description = "Retrieves a specific roadmap using its UUID.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Roadmap retrieved successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Roadmap not found with the given ID")
+    })
     public ResponseEntity<ApiResponse<RoadmapResponse>> getRoadmapById(@PathVariable UUID id) {
         log.info("REST request to fetch Roadmap with ID: {}", id);
         
@@ -96,6 +114,12 @@ public class RoadmapController {
      * @return Standard ApiResponse wrapper containing the updated Roadmap representation.
      */
     @PutMapping("/{id}")
+    @Operation(summary = "Update roadmap", description = "Updates the details of an existing roadmap using its UUID.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Roadmap updated successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid request body or validation constraints failed"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Roadmap not found with the given ID")
+    })
     public ResponseEntity<ApiResponse<RoadmapResponse>> updateRoadmap(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateRoadmapRequest request) {
@@ -112,6 +136,11 @@ public class RoadmapController {
      * @return Standard ApiResponse wrapper indicating success (empty data field).
      */
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete roadmap", description = "Deletes a specific roadmap and its associated milestones and tasks by its UUID.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Roadmap deleted successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Roadmap not found with the given ID")
+    })
     public ResponseEntity<ApiResponse<Void>> deleteRoadmap(@PathVariable UUID id) {
         log.info("REST request to delete Roadmap with ID: {}", id);
         

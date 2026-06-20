@@ -3,6 +3,7 @@ package com.nexora.roadmap.controller;
 import com.nexora.common.response.ApiResponse;
 import com.nexora.roadmap.dto.request.CreateMilestoneRequest;
 import com.nexora.roadmap.dto.request.UpdateMilestoneRequest;
+import com.nexora.roadmap.dto.response.MilestoneProgressResponse;
 import com.nexora.roadmap.dto.response.MilestoneResponse;
 import com.nexora.roadmap.service.MilestoneService;
 import jakarta.validation.Valid;
@@ -123,5 +124,20 @@ public class MilestoneController {
         
         milestoneService.deleteMilestone(id);
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    /**
+     * Calculate and fetch progress tracking information for a specific Milestone.
+     *
+     * @param id The Milestone UUID.
+     * @return Standard ApiResponse wrapper containing the MilestoneProgressResponse.
+     */
+    @GetMapping("/milestones/{id}/progress")
+    public ResponseEntity<ApiResponse<MilestoneProgressResponse>> getMilestoneProgress(
+            @PathVariable UUID id) {
+        log.info("REST request to fetch progress for Milestone with ID: {}", id);
+        
+        MilestoneProgressResponse response = milestoneService.getMilestoneProgress(id);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

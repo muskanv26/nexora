@@ -6,9 +6,12 @@ import com.nexora.roadmap.dto.request.UpdateMilestoneRequest;
 import com.nexora.roadmap.dto.response.MilestoneResponse;
 import com.nexora.roadmap.entity.Milestone;
 import com.nexora.roadmap.entity.Roadmap;
+import com.nexora.roadmap.dto.response.MilestoneProgressResponse;
+import com.nexora.roadmap.entity.TaskStatus;
 import com.nexora.roadmap.mapper.MilestoneMapper;
 import com.nexora.roadmap.repository.MilestoneRepository;
 import com.nexora.roadmap.repository.RoadmapRepository;
+import com.nexora.roadmap.repository.TaskRepository;
 import com.nexora.roadmap.service.MilestoneService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +47,7 @@ public class MilestoneServiceImpl implements MilestoneService {
     private final MilestoneRepository milestoneRepository;
     private final RoadmapRepository roadmapRepository;
     private final MilestoneMapper milestoneMapper;
+    private final TaskRepository taskRepository;
 
     @Override
     @Transactional
@@ -144,5 +148,34 @@ public class MilestoneServiceImpl implements MilestoneService {
 
         milestoneRepository.deleteById(id);
         log.info("Milestone with ID {} deleted successfully", id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MilestoneProgressResponse getMilestoneProgress(UUID id) {
+        log.info("Calculating progress for Milestone ID: {}", id);
+
+        Milestone milestone = milestoneRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Milestone lookup failed: ID {} not found", id);
+                    return new ApiException(
+                            "Milestone not found with id " + id,
+                            "MILESTONE_NOT_FOUND",
+                            HttpStatus.NOT_FOUND
+                    );
+                });
+
+        long totalTasks = taskRepository.countByMilestoneId(id);
+        long completedTasks = taskRepository.countByMilestoneIdAndStatus(id, TaskStatus.COMPLETED);
+
+        double progressPercentage = totalTasks == 0 ? 0.0 : (completedTasks * 100.0) / totalTasks;
+
+        return MilestoneProgressResponse.builder()
+                .milestoneId(milestone.getId())
+                .milestoneTitle(milestone.getTitle())
+                .totalTasks(totalTasks)
+                .completedTasks(completedTasks)
+                .progressPercentage(progressPercentage)
+                .build();
     }
 }

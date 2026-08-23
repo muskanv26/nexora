@@ -7,6 +7,7 @@ import com.nexora.roadmap.dto.response.GenerateRoadmapResponse;
 import com.nexora.roadmap.dto.response.RoadmapResponse;
 import com.nexora.roadmap.entity.DifficultyLevel;
 import com.nexora.roadmap.service.AiRoadmapService;
+import com.nexora.roadmap.service.CareerReadinessService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ class AiRoadmapControllerTest {
 
     @MockBean
     private AiRoadmapService aiRoadmapService;
+
+    @MockBean
+    private CareerReadinessService careerReadinessService;
 
     @Autowired
     private ObjectMapper objectMapper;

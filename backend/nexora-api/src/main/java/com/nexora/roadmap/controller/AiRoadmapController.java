@@ -2,9 +2,12 @@ package com.nexora.roadmap.controller;
 
 import com.nexora.common.response.ApiResponse;
 import com.nexora.roadmap.dto.request.GenerateRoadmapRequest;
+import com.nexora.roadmap.dto.request.CareerReadinessRequest;
 import com.nexora.roadmap.dto.response.GenerateRoadmapResponse;
+import com.nexora.roadmap.dto.response.CareerReadinessResponse;
 import com.nexora.roadmap.dto.response.RoadmapResponse;
 import com.nexora.roadmap.service.AiRoadmapService;
+import com.nexora.roadmap.service.CareerReadinessService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class AiRoadmapController {
 
     private final AiRoadmapService aiRoadmapService;
+    private final CareerReadinessService careerReadinessService;
 
     /**
      * Generates a preview roadmap using Gemini AI without saving it.
@@ -87,5 +91,25 @@ public class AiRoadmapController {
         log.info("REST request to generate and save AI roadmap");
         RoadmapResponse response = aiRoadmapService.generateAndSaveRoadmap(request);
         return new ResponseEntity<>(ApiResponse.success(response), HttpStatus.CREATED);
+    }
+
+    /**
+     * Evaluates user's career readiness against a target role.
+     *
+     * @param request Target role and current skills list.
+     * @return Evaluation details enveloped in standard ApiResponse.
+     */
+    @PostMapping("/career-readiness")
+    @Operation(summary = "Evaluate career readiness", description = "Evaluates the candidate's career readiness for a target role, calculating score and level deterministically and suggesting action plans using Gemini.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Readiness score evaluated successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid request payload"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal configuration or AI invocation failure")
+    })
+    public ResponseEntity<ApiResponse<CareerReadinessResponse>> evaluateCareerReadiness(
+            @Valid @RequestBody CareerReadinessRequest request) {
+        log.info("REST request to evaluate career readiness");
+        CareerReadinessResponse response = careerReadinessService.evaluateCareerReadiness(request);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }
